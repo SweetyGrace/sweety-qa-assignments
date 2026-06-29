@@ -1,0 +1,21 @@
+{
+  "name": "assignment-3-polymer-shop-automation",
+  "version": "1.0.0",
+  "description": "Playwright E2E automation for Polymer Shop using Page Object Model",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:sanity": "npx playwright test src/tests/sanity/",
+    "test:regression": "npx playwright test src/tests/regression/",
+    "test:e2e": "npx playwright test src/tests/e2e/",
+    "test:headed": "npx playwright test --headed",
+    "test:report": "npx playwright show-report playwright-report",
+    "test:debug": "npx playwright test --debug",
+    "pretest": "mkdir -p playwright-report/screenshots"
+  },
+  "keywords": ["playwright", "automation", "e2e", "pom", "polymer-shop"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}
