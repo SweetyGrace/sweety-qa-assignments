@@ -1,0 +1,353 @@
+{
+  "info": {
+    "name": "ShopEasy — PetStore API Testing",
+    "description": "Assignment 2: API Testing — 12 endpoints, 1 positive + 1 negative each (24 total). Base URL: https://petstore.swagger.io/v2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://petstore.swagger.io/v2" },
+    { "key": "petId", "value": "101010" },
+    { "key": "orderId", "value": "5001" },
+    { "key": "username", "value": "testuser_qa" },
+    { "key": "password", "value": "Test@1234" },
+    { "key": "apiKey", "value": "special-key" }
+  ],
+  "item": [
+    {
+      "name": "User Module",
+      "item": [
+        {
+          "name": "TC-09 Positive — POST /user Create User",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('User created with correct message', function () { pm.expect(jsonData.message).to.eql('9001'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 9001,\n  \"username\": \"testuser_qa\",\n  \"firstName\": \"QA\",\n  \"lastName\": \"Tester\",\n  \"email\": \"qa@shopeasy.com\",\n  \"password\": \"Test@1234\",\n  \"phone\": \"9876543210\",\n  \"userStatus\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/user", "host": ["{{baseUrl}}"], "path": ["user"] }
+          }
+        },
+        {
+          "name": "TC-09 Negative — POST /user Empty Body",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 400 or 405', function () { pm.expect(pm.response.code).to.be.oneOf([400, 405]); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{baseUrl}}/user", "host": ["{{baseUrl}}"], "path": ["user"] }
+          }
+        },
+        {
+          "name": "TC-10 Positive — GET /user/login",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Response contains message', function () { pm.expect(jsonData).to.have.property('message'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/login?username={{username}}&password={{password}}", "host": ["{{baseUrl}}"], "path": ["user", "login"], "query": [{ "key": "username", "value": "{{username}}" }, { "key": "password", "value": "{{password}}" }] }
+          }
+        },
+        {
+          "name": "TC-10 Negative — GET /user/login Empty Credentials",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/login?username=&password=", "host": ["{{baseUrl}}"], "path": ["user", "login"], "query": [{ "key": "username", "value": "" }, { "key": "password", "value": "" }] }
+          }
+        },
+        {
+          "name": "TC-11 Positive — GET /user/{username}",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Username matches', function () { pm.expect(jsonData.username).to.eql('testuser_qa'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/{{username}}", "host": ["{{baseUrl}}"], "path": ["user", "{{username}}"] }
+          }
+        },
+        {
+          "name": "TC-11 Negative — GET /user/nonexistent",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Error message is User not found', function () { pm.expect(jsonData.message).to.eql('User not found'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/user/nonexistentuser_xyz_99999", "host": ["{{baseUrl}}"], "path": ["user", "nonexistentuser_xyz_99999"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pet Module",
+      "item": [
+        {
+          "name": "TC-01 Positive — POST /pet Add New Pet",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Pet name is BuddyQA', function () { pm.expect(jsonData.name).to.eql('BuddyQA'); });",
+            "pm.test('Pet status is available', function () { pm.expect(jsonData.status).to.eql('available'); });",
+            "pm.environment.set('petId', jsonData.id);"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 101010,\n  \"name\": \"BuddyQA\",\n  \"status\": \"available\",\n  \"category\": { \"id\": 1, \"name\": \"Dogs\" },\n  \"photoUrls\": [\"https://example.com/dog.jpg\"],\n  \"tags\": [{ \"id\": 1, \"name\": \"qa-test\" }]\n}" },
+            "url": { "raw": "{{baseUrl}}/pet", "host": ["{{baseUrl}}"], "path": ["pet"] }
+          }
+        },
+        {
+          "name": "TC-01 Negative — POST /pet Invalid ID",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 400 or 405', function () { pm.expect(pm.response.code).to.be.oneOf([400, 405]); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"id\": \"INVALID_ID\", \"name\": \"\" }" },
+            "url": { "raw": "{{baseUrl}}/pet", "host": ["{{baseUrl}}"], "path": ["pet"] }
+          }
+        },
+        {
+          "name": "TC-02 Positive — GET /pet/{petId}",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Pet ID matches', function () { pm.expect(jsonData.id).to.eql(101010); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/pet/101010", "host": ["{{baseUrl}}"], "path": ["pet", "101010"] }
+          }
+        },
+        {
+          "name": "TC-02 Negative — GET /pet/9999999999 Not Found",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Error message is Pet not found', function () { pm.expect(jsonData.message).to.eql('Pet not found'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/pet/9999999999", "host": ["{{baseUrl}}"], "path": ["pet", "9999999999"] }
+          }
+        },
+        {
+          "name": "TC-03 Positive — PUT /pet Update Pet",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Pet name updated', function () { pm.expect(jsonData.name).to.eql('BuddyQA-Updated'); });",
+            "pm.test('Pet status is sold', function () { pm.expect(jsonData.status).to.eql('sold'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 101010,\n  \"name\": \"BuddyQA-Updated\",\n  \"status\": \"sold\",\n  \"photoUrls\": [\"https://example.com/dog.jpg\"]\n}" },
+            "url": { "raw": "{{baseUrl}}/pet", "host": ["{{baseUrl}}"], "path": ["pet"] }
+          }
+        },
+        {
+          "name": "TC-03 Negative — PUT /pet Invalid Body",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 400 or 405', function () { pm.expect(pm.response.code).to.be.oneOf([400, 405]); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"id\": 0, \"name\": \"\" }" },
+            "url": { "raw": "{{baseUrl}}/pet", "host": ["{{baseUrl}}"], "path": ["pet"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Store Module",
+      "item": [
+        {
+          "name": "TC-06 Positive — POST /store/order Place Order",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Order ID matches', function () { pm.expect(jsonData.id).to.eql(5001); });",
+            "pm.test('Order status is placed', function () { pm.expect(jsonData.status).to.eql('placed'); });",
+            "pm.environment.set('orderId', jsonData.id);"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": 5001,\n  \"petId\": 101010,\n  \"quantity\": 1,\n  \"status\": \"placed\",\n  \"complete\": false\n}" },
+            "url": { "raw": "{{baseUrl}}/store/order", "host": ["{{baseUrl}}"], "path": ["store", "order"] }
+          }
+        },
+        {
+          "name": "TC-06 Negative — POST /store/order Invalid Body",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 400', function () { pm.response.to.have.status(400); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ \"id\": \"INVALID\", \"quantity\": -1 }" },
+            "url": { "raw": "{{baseUrl}}/store/order", "host": ["{{baseUrl}}"], "path": ["store", "order"] }
+          }
+        },
+        {
+          "name": "TC-07 Positive — GET /store/order/{orderId}",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Order ID is 5001', function () { pm.expect(jsonData.id).to.eql(5001); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/store/order/5001", "host": ["{{baseUrl}}"], "path": ["store", "order", "5001"] }
+          }
+        },
+        {
+          "name": "TC-07 Negative — GET /store/order/9999999 Not Found",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Error message is Order not found', function () { pm.expect(jsonData.message).to.eql('Order not found'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/store/order/9999999", "host": ["{{baseUrl}}"], "path": ["store", "order", "9999999"] }
+          }
+        },
+        {
+          "name": "TC-05 Positive — GET /store/inventory",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Response is an object', function () { pm.expect(jsonData).to.be.an('object'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "api_key", "value": "{{apiKey}}" }],
+            "url": { "raw": "{{baseUrl}}/store/inventory", "host": ["{{baseUrl}}"], "path": ["store", "inventory"] }
+          }
+        },
+        {
+          "name": "TC-05 Negative — GET /store/inventory No Auth",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200 or 401', function () { pm.expect(pm.response.code).to.be.oneOf([200, 401]); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "pm.test('Response is not an error object with type field', function () { var jsonData = pm.response.json(); pm.expect(jsonData).to.not.have.property('type'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "api_key", "value": "invalid-key-xyz" }],
+            "url": { "raw": "{{baseUrl}}/store/inventory", "host": ["{{baseUrl}}"], "path": ["store", "inventory"] }
+          }
+        },
+        {
+          "name": "TC-08 Positive — DELETE /store/order/{orderId}",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });",
+            "var jsonData = pm.response.json();",
+            "pm.test('Deleted order message is 5001', function () { pm.expect(jsonData.message).to.eql('5001'); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/store/order/5001", "host": ["{{baseUrl}}"], "path": ["store", "order", "5001"] }
+          }
+        },
+        {
+          "name": "TC-08 Negative — DELETE /store/order/0 Invalid",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 400 or 404', function () { pm.expect(pm.response.code).to.be.oneOf([400, 404]); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/store/order/0", "host": ["{{baseUrl}}"], "path": ["store", "order", "0"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "TC-04 Positive — DELETE /pet/{petId}",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "api_key", "value": "{{apiKey}}" }],
+            "url": { "raw": "{{baseUrl}}/pet/101010", "host": ["{{baseUrl}}"], "path": ["pet", "101010"] }
+          }
+        },
+        {
+          "name": "TC-04 Negative — DELETE /pet/9999999999 Not Found",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "api_key", "value": "{{apiKey}}" }],
+            "url": { "raw": "{{baseUrl}}/pet/9999999999", "host": ["{{baseUrl}}"], "path": ["pet", "9999999999"] }
+          }
+        },
+        {
+          "name": "TC-12 Positive — DELETE /user/{username}",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/user/{{username}}", "host": ["{{baseUrl}}"], "path": ["user", "{{username}}"] }
+          }
+        },
+        {
+          "name": "TC-12 Negative — DELETE /user/nonexistent",
+          "event": [{ "listen": "test", "script": { "exec": [
+            "pm.test('Status code is 404', function () { pm.response.to.have.status(404); });",
+            "pm.test('Response time < 3000ms', function () { pm.expect(pm.response.responseTime).to.be.below(3000); });"
+          ], "type": "text/javascript" } }],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/user/nonexistentuser_xyz_99999", "host": ["{{baseUrl}}"], "path": ["user", "nonexistentuser_xyz_99999"] }
+          }
+        }
+      ]
+    }
+  ]
+}
